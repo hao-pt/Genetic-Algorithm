@@ -251,7 +251,8 @@ class GA:
                          no_bits_per_item=self.no_bits_per_item, offset=self.offset, initial=True)
         # print(pop)
         x = pop.get_fittess_indiv()
-        print("Initial x = {0}, fitness = {1}".format((x+self.offset), self.equation(x+self.offset)))
+        print("{:*^120}".format("Initial fittess x"))
+        print("x = {0}, fitness = {1}".format((x+self.offset), self.equation(x+self.offset)))
 
         # Set first pop
         self.evol.setPop(pop)
@@ -266,7 +267,8 @@ class GA:
             # Print solution
             if i % self.print_solution_each_gen == 0:
                 x = pop.get_fittess_indiv()
-                print("Generation {0}: x = {1}".format(i, x+self.offset), end="")
+                print("{:-^50}Generation {}{:-^50}".format("", i, ""))
+                print("x = {}".format(x+self.offset), end="")
                 print(", fitness = {0}".format(self.equation(x+self.offset)))
 
         return self.evol.getPop().get_fittess_indiv() + self.offset
@@ -280,7 +282,8 @@ def main():
        elitism_rate=0.2, print_solution_each_gen=5)
 
     x = ga.genetic_algorithm()
-    print("Final x = {}, fitness = {}".format(x, equation(x)))
+    print("{:*^120}".format("Final fittes x"))        
+    print("x = {}, fitness = {}".format(x, equation(x)))
 
 if __name__ == "__main__":
     main()
