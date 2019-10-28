@@ -138,6 +138,14 @@ class NumberArray(Number):
         self.no_items = self.__len__()
         self.no_bits = self.no_items * self.no_bits_per_item
 
+    def get_list(self) -> list:
+        list_num = []
+        for i in range(self.no_items):
+            item = self.data[i*self.no_bits_per_item:(i+1)*self.no_bits_per_item].int
+            list_num.append(item)
+
+        return list_num
+
     def __str__(self):
         list_num = []
         for i in range(self.no_items):
@@ -149,8 +157,6 @@ class NumberArray(Number):
         num_list = self.__getitem__(slice(0, self.no_items))
         return iter(num_list)
                 
-            
-
 
 
 

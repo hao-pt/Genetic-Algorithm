@@ -1,8 +1,7 @@
 import math
 import random
 from bit_manager import Number, NumberArray
-
-random.seed(174)
+import argparse
 
 class Population:
     """Population is a collection of posible solutions (individuals)"""
@@ -31,7 +30,9 @@ class Population:
         """Compute weights (fitness) of each individuals"""
         weights = []
         for num in self.population:
-            weights.append(self.high_bound - self.equation(num+self.offset))
+            # Our purpose: find x with fitness value near 0 as much as possible
+            # So if abs(x) is large, negative of it (weight) will be small
+            weights.append(0 - abs(self.equation(num+self.offset))) # abs to find x near 0
         return weights
 
     def pick_indiv_randomly(self) -> int:
@@ -45,8 +46,13 @@ class Population:
     def sortPopulation(self):
         """Sort population base on fitness in descending order"""
         tmp = [num + self.offset for num in self.population]
-        sorted_list = sorted(tmp, key=self.equation, reverse=True)
-        self.population[:] = [num - self.offset for num in sorted_list]
+        for i in range(self.population_size-1):
+            for j in range(i+1, self.population_size):
+                # abs to find x near 0
+                if abs(self.equation(tmp[i])) < abs(self.equation(tmp[j])):
+                    tmp[i], tmp[j] = tmp[j], tmp[i]
+        # sorted_list = sorted(tmp, key=self.equation, reverse=True)
+        self.population[:] = [num - self.offset for num in tmp]
         
 
     def getPopulation(self) -> NumberArray:
@@ -194,7 +200,7 @@ class GA:
     """
     def __init__(self, equation, boundary: tuple, population_size=4,\
                  no_generations=100, mutation_rate=0.1, mating_rate=0.5,\
-                 elitism_rate=0.2, print_solution_each_gen=5):
+                 elitism_rate=0.2, print_solution_per_gen=5):
         """
         Init function
 
@@ -205,7 +211,7 @@ class GA:
             mating_rate: the probability for mating (crossover)
             elitism_rate: the rate of best individuals to keep in next generation
             equation: lambda equation
-            print_solution_each_gen: print solution each 5 generations
+            print_solution_per_gen: print solution each 5 generations
             boundary: the boundary (doman) of x
         """
         self.equation = equation
@@ -225,7 +231,7 @@ class GA:
         self.domain = self.high_bound - self.low_bound + 1
 
 
-        self.print_solution_each_gen = print_solution_each_gen
+        self.print_solution_per_gen = print_solution_per_gen
         self.no_bits_per_item = math.ceil(math.log2(self.domain)) + 1 # Number of bits represent the binary encode of each solution (Include extra sign bit)
         # Init evol object
         self.evol = Evolution(equation=self.equation, boundary=(self.low_bound, self.high_bound),\
@@ -265,7 +271,7 @@ class GA:
             self.evol.setPop(pop)
 
             # Print solution
-            if i % self.print_solution_each_gen == 0:
+            if i % self.print_solution_per_gen == 0:
                 x = pop.get_fittess_indiv()
                 print("{:-^50}Generation {}{:-^50}".format("", i, ""))
                 print("x = {}".format(x+self.offset), end="")
@@ -273,17 +279,44 @@ class GA:
 
         return self.evol.getPop().get_fittess_indiv() + self.offset
 
-def main():
+def ParseArgs():
+    parser = argparse.ArgumentParser(description="Quadratic equation commandline")
+    parser.add_argument('-coeff', '--coefficients', nargs=3, type=float,\
+         help="Coefficients of the equation (a: the quadratic coefficient, b: the linear coefficient and c: the constant)")
+    parser.add_argument('-bound', '--boundary', nargs=2, type=int,\
+         help="Boundary (domain) of problem")
+    parser.add_argument("-psize", "--pop_size", type=int, default=5, help="Population size")
+    parser.add_argument("-no_gens", "--no_generations", type=int, default=5,\
+         help="Number of generations to process")
+    parser.add_argument("-mu_rate", "--mutation_rate", type=float, default=0.1,\
+         help="Probability of mutation")
+    parser.add_argument("-ma_rate", "--mating_rate", type=float, default=0.5,\
+         help="Probability of mating (crossover)")
+    parser.add_argument("-elit_rate", "--elitism_rate", type=float, default=0.2,\
+         help="The rate of number of best individuals to keep in next generation")
+    parser.add_argument("-print", "--print_solution_per_gen", type=int, default=5,\
+         help="Print solution per number of generations")
+    parser.add_argument("-seed", "--seed", type=int, default=174,\
+         help="Random seed")
+    
+    args = parser.parse_args()
+    return args
+
+def main(args):
+    random.seed(args.seed)
+
+    a, b, c = list(args.coefficients)
     # equation = lambda x: x**2 - 10*x + 5
-    equation = lambda x: x**2 + 4*x + 4
-    boundary = (-10, 10)
-    ga = GA(equation, boundary, population_size=5,\
-       no_generations=8, mutation_rate=0.1, mating_rate=0.5,\
-       elitism_rate=0.2, print_solution_each_gen=5)
+    equation = lambda x:  a*(x**2) + b*x + c
+    
+    # boundary = (-10, 10)
+    ga = GA(equation, args.boundary, population_size=args.pop_size,\
+       no_generations=args.no_generations, mutation_rate=args.mutation_rate, mating_rate=args.mating_rate,\
+       elitism_rate=args.elitism_rate, print_solution_per_gen=args.print_solution_per_gen)
 
     x = ga.genetic_algorithm()
     print("{:*^120}".format("Final fittes x"))        
     print("x = {}, fitness = {}".format(x, equation(x)))
 
 if __name__ == "__main__":
-    main()
+    main(ParseArgs())
