@@ -134,8 +134,8 @@ python quadratic_eq.py -coeff 1 4 4 -bound -10 10 -psize 5 -no_gens 8\
 - For example: our quadratic equation is x**2 + 4*x + 4 where x is in [-10, 10].
 
   - Arguments:
-    - `-coeff`: Coefficents for quadratic equation such as a, b and c
-    - `-bound`: Boundary of x is list of integer ([int, int])
+    - `-coeff`: Coefficents for quadratic equation such as a = 1, b = 4 and c = 4
+    - `-bound`: Boundary of x is list of integer ([-10, 10])
     - Population size `-psize` is 5
     - Number of gennerations to run `-no_gens` is 8
     - Mutation rate `-mu_rate` is 0.1
