@@ -121,13 +121,21 @@ optional arguments:
                         Random seed
 ```
 - Run GA algorithm
+
+  - Formulation of quadratic equation: `ax^2 + bx + c = 0`
+  - Notice: my program just solve for interger "variable" `x`. Therefore, the boundary of `x` must be in integer boundary [-int, int].
+
 ```
 python quadratic_eq.py -coeff 1 4 4 -bound -10 10 -psize 5 -no_gens 8\
                        -mu_rate 0.1 -ma_rate 0.5 -elit_rate 0.2 -print 5
 ```
-  - For example: our quadratic equation is x**2 + 4*x + 4 where x is in [-10, 10].
 
-  - Other arguments:
+
+- For example: our quadratic equation is x**2 + 4*x + 4 where x is in [-10, 10].
+
+  - Arguments:
+    - `-coeff`: Coefficents for quadratic equation such as a, b and c
+    - `-bound`: Boundary of x is list of integer ([int, int])
     - Population size `-psize` is 5
     - Number of gennerations to run `-no_gens` is 8
     - Mutation rate `-mu_rate` is 0.1
