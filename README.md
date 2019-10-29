@@ -59,14 +59,26 @@ optional arguments:
 
 - Gennerate data
 ```
-python tsp.py -fo input3.json  -genn_data -bound -500 500 -n 80 -ob_rate 0.98 -seed 3000 -plot_map
+python tsp.py -fo input3.json  -genn_data -bound -500 500 -n 80\
+              -ob_rate 0.98 -seed 3000 -plot_map
 ```
 For example: we gennerate our data with random coordinates x and y which are ranged [-500.0, 500.0] for 80 cities. We use obstacle rate (0.98) to gennerate `map_obstacle` which contains only 0/1 values. Where 0: no obstacle and otherwise. I set seed equal 3000 for consistent random each run and turn `plot_map` flag on to plot `map_obstacle`.
 
 - Run GA algorithm
 ```
-python tsp.py -f input1.json  -psize 70 -no_gens 150 -mu_rate 0.15 -elit_rate 0.15 -ts 15 -plot_res -plot_map
+python tsp.py -f input1.json  -psize 70 -no_gens 150 -mu_rate 0.15\
+              -elit_rate 0.15 -ts 15 -plot_res -plot_map
 ```
+
+Arguments:
+- Input file `-f`: input1.json
+- Population size `-psize`: 70
+- Number of generation to run `-no_gens`: 150
+- Mutation rate `-mu_rate`: 0.15
+- The rate of elitism that we want to keep in next generation `-elit_rate`: 0.15
+- Tournament size is used to select one fittess individual in sub-sample of population `-ts`: 15
+- Plot the path result by turn `-plot_res` flag on.
+- Plot `map_obstacle` by toggle `-plot_map`.
 
 
 ### Qudratic problem
@@ -110,14 +122,15 @@ optional arguments:
 ```
 - Run GA algorithm
 ```
-python quadratic_eq.py -coeff 1 4 4 -bound -10 10 -psize 5 -no_gens 8 -mu_rate 0.1 -ma_rate 0.5 -elit_rate 0.2 -print 5
+python quadratic_eq.py -coeff 1 4 4 -bound -10 10 -psize 5 -no_gens 8\
+                       -mu_rate 0.1 -ma_rate 0.5 -elit_rate 0.2 -print 5
 ```
   - For example: our quadratic equation is x**2 + 4*x + 4 where x is in [-10, 10].
 
   - Other arguments:
-    - Population size is 5
-    - Number of gennerations to run is 8
-    - Mutation rate is 0.1
-    - Mating rate is 0.5
-    - The rate of elitism that we want to keep in next generation is 0.2
-   - Print results per 5 generations
+    - Population size `-psize` is 5
+    - Number of gennerations to run `-no_gens` is 8
+    - Mutation rate `-mu_rate` is 0.1
+    - Mating rate `-ma_rate` is 0.5
+    - The rate of elitism that we want to keep in next generation `-elit_rate` is 0.2
+    - `-print`: Print results per 5 generations
