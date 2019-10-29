@@ -139,7 +139,7 @@ class Map:
 
     def align_tour_ids(self, tour_ids: list) -> list:
         """
-        Align the tour_ids to satisfy the constraint
+        Align the tour_ids to satisfy the constraint using greedy coloring algorithm
         """
         n = self.size()
         
@@ -323,6 +323,8 @@ class Population:
         """Initialize first population"""
         n = self.map.size() # Number of cities
         for i in range(self.population_size):
+            if i % 10 == 0:
+                print("Initialize {}-th tour...".format(i))
             new_tour = Tour(tour_size=n, city_map=self.map)
             self.population.append(new_tour)
 
@@ -584,6 +586,7 @@ class GA:
             mutation_rate: the low probability for mutation
             elitism_size: Number of best individuals in next generation
         """
+        print("{:*^120}".format("Initialize first population"))                
         # Init first population
         pop = Population(self.population_size, self.map, initial=True)
         # print(pop)
@@ -642,8 +645,9 @@ class GA:
 
 def ParseArgs():
     parser = argparse.ArgumentParser(description="Travelling Salesman Problem commandline")
+    # Genetic algorithm args
     parser.add_argument('-f', '--input_file', type=str,\
-         help="Filename of inputs (Location and Map)")
+         help="Filename of json file inputs (Location and Map)")
     parser.add_argument("-psize", "--pop_size", type=int, default=50, help="Population size")
     parser.add_argument("-no_gens", "--no_generations", type=int, default=100,\
          help="Number of generations to process")
@@ -659,78 +663,53 @@ def ParseArgs():
          help="Random seed")
     parser.add_argument("-plot_res", "--plot_result", action="store_true",\
          help="Plot result map")
+    
+    # Gennerate data args
     parser.add_argument("-plot_map", "--plot_map_obstacle", action="store_true",\
          help="Plot map obstacle")
-    
+    parser.add_argument("-genn_data", "--gennerate_data", action="store_true",\
+         help="Run gennerate dataset")
+    parser.add_argument('-bound', '--boundary', nargs=2, type=float,\
+         help="Boundary (max_x, max_y) of x and y")
+    parser.add_argument('-fo', '--output_file', type=str,\
+         help="Filename of json file to write out")
+    parser.add_argument("-n", "--no_cities", type=int, default=64,\
+         help="Number of cities to gennerate")
+    parser.add_argument("-ob_rate", "--obstacle_rate", type=float, default=0.97,\
+         help="Probability of obstacle to gennerate")
+
     args = parser.parse_args()
     return args
 
 def main(args):
-
-    filename = args.input_file
     # Set seed
     random.seed(args.seed)
     # Init map
     city_map = Map()
 
     # -------------------------- Gennerate data -------------------------------------
-    # # Write file json the data
-    # n = 100
-    # # Init city location randomly
-    # city_map.init_list_cities(n=n, boundary=(500, 500))
-    # # Init map_obstacle
-    # city_map.init_map(obstacle_rate=0.97)
-    # # city_map.plot_map()
-    # # plt.show()
-    # # city_map.set_map(np.zeros((n, n), dtype=np.uint8))
-    # # city_map.write_json("input3.json")
+    if args.gennerate_data:
+        # Get number of cities to gennerate
+        n = args.no_cities
+        # Init city location randomly
+        city_map.init_list_cities(n=n, boundary=tuple(args.boundary))
+        # Init map_obstacle
+        city_map.init_map(obstacle_rate=args.obstacle_rate)
+        if args.plot_map_obstacle:
+            city_map.plot_map()
+            
+        # Write file json the data
+        city_map.write_json(args.output_file)
+
+        plt.show()
+        return
 
     # Read file json of input data
+    filename = args.input_file
     city_map.read_json(filename)
     if args.plot_map_obstacle:
         city_map.plot_map()
 
-    # Create and add our cities
-    # city = City(60, 200)
-    # city_map.insert(city)
-    # city2 = City(180, 200)
-    # city_map.insert(city2)
-    # city3 = City(80, 180)
-    # city_map.insert(city3)
-    # city4 = City(140, 180)
-    # city_map.insert(city4)
-    # city5 = City(20, 160)
-    # city_map.insert(city5)
-    # city6 = City(100, 160)
-    # city_map.insert(city6)
-    # city7 = City(200, 160)
-    # city_map.insert(city7)
-    # city8 = City(140, 140)
-    # city_map.insert(city8)
-    # city9 = City(40, 120)
-    # city_map.insert(city9)
-    # city10 = City(100, 120)
-    # city_map.insert(city10)
-    # city11 = City(180, 100)
-    # city_map.insert(city11)
-    # city12 = City(60, 80)
-    # city_map.insert(city12)
-    # city13 = City(120, 80)
-    # city_map.insert(city13)
-    # city14 = City(180, 60)
-    # city_map.insert(city14)
-    # city15 = City(20, 40)
-    # city_map.insert(city15)
-    # city16 = City(100, 40)
-    # city_map.insert(city16)
-    # city17 = City(200, 40)
-    # city_map.insert(city17)
-    # city18 = City(20, 20)
-    # city_map.insert(city18)
-    # city19 = City(60, 20)
-    # city_map.insert(city19)
-    # city20 = City(160, 20)
-    # city_map.insert(city20)
         
     ga = GA(city_map, population_size=args.pop_size, no_generations=args.no_generations, mutation_rate=args.mutation_rate,\
             elitism_rate=args.elitism_rate, tournament_size=args.tournament_size, print_cost_per_gen=args.print_cost_per_gen)
@@ -751,3 +730,44 @@ def main(args):
 if __name__ == "__main__":
     main(ParseArgs())
 
+# Create and add our cities
+# city = City(60, 200)
+# city_map.insert(city)
+# city2 = City(180, 200)
+# city_map.insert(city2)
+# city3 = City(80, 180)
+# city_map.insert(city3)
+# city4 = City(140, 180)
+# city_map.insert(city4)
+# city5 = City(20, 160)
+# city_map.insert(city5)
+# city6 = City(100, 160)
+# city_map.insert(city6)
+# city7 = City(200, 160)
+# city_map.insert(city7)
+# city8 = City(140, 140)
+# city_map.insert(city8)
+# city9 = City(40, 120)
+# city_map.insert(city9)
+# city10 = City(100, 120)
+# city_map.insert(city10)
+# city11 = City(180, 100)
+# city_map.insert(city11)
+# city12 = City(60, 80)
+# city_map.insert(city12)
+# city13 = City(120, 80)
+# city_map.insert(city13)
+# city14 = City(180, 60)
+# city_map.insert(city14)
+# city15 = City(20, 40)
+# city_map.insert(city15)
+# city16 = City(100, 40)
+# city_map.insert(city16)
+# city17 = City(200, 40)
+# city_map.insert(city17)
+# city18 = City(20, 20)
+# city_map.insert(city18)
+# city19 = City(60, 20)
+# city_map.insert(city19)
+# city20 = City(160, 20)
+# city_map.insert(city20)
